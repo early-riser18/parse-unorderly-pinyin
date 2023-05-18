@@ -448,38 +448,42 @@ diacritics_to_base_letter = {
     "ǜ": "ü",
 }
 
-diacritics_to_decimals = {
+diacritics_to_decimals_basic = {
     "ā": ("a", 1),
     "á": ("a", 2),
     "ǎ": ("a", 3),
     "à": ("a", 4),
-    "a": ("a", 5),
     "ē": ("e", 1),
     "é": ("e", 2),
     "ě": ("e", 3),
     "è": ("e", 4),
-    "e": ("e", 5),
     "ī": ("i", 1),
     "í": ("i", 2),
     "ǐ": ("i", 3),
     "ì": ("i", 4),
-    "i": ("i", 5),
     "ō": ("o", 1),
     "ó": ("o", 2),
     "ǒ": ("o", 3),
     "ò": ("o", 4),
-    "o": ("o", 5),
     "ū": ("u", 1),
     "ú": ("u", 2),
     "ǔ": ("u", 3),
     "ù": ("u", 4),
-    "u": ("u", 5),
     "ǖ": ("ü", 1),
     "ǘ": ("ü", 2),
     "ǚ": ("ü", 3),
     "ǜ": ("ü", 4),
+}
+diacritics_to_decimals_tone_five = {
+    "a": ("a", 5),
+    "e": ("e", 5),
+    "i": ("i", 5),
+    "o": ("o", 5),
+    "u": ("u", 5),
     "ü": ("ü", 5),
 }
+diacritics_to_decimals_full = {**diacritics_to_decimals_tone_five, **diacritics_to_decimals_basic}
+
 
 single_letter_consonant = [
     "b",
