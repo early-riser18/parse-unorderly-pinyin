@@ -119,9 +119,4 @@ class PinyinUtils:
                 diacritics_to_decimals_basic[extracted_accent[0]][1]
             )
 
-        for char in syllable:
-            if char in diacritics_to_decimals_full:
-                output = syllable.replace(char,diacritics_to_decimals_full[char][0])
-                output += str(diacritics_to_decimals_full[char][1])
-                break
         return output
