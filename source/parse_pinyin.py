@@ -107,8 +107,17 @@ class PinyinUtils:
         It is assumed that there is only 1 accent per syllable.
 
         """
-        matched_vowel = ""
-        output = ""
+        extracted_accent = []
+        extracted_accent = [char for char in syllable if char in diacritics_to_decimals_basic]
+        syllable_no_diacritics = self.remove_pinyin_diacritics(syllable)
+        
+        if len(extracted_accent) == 0:
+            output = syllable_no_diacritics + "5"
+
+        elif len(extracted_accent) == 1:
+            output = syllable_no_diacritics + str(
+                diacritics_to_decimals_basic[extracted_accent[0]][1]
+            )
 
         for char in syllable:
             if char in diacritics_to_decimals_full:
