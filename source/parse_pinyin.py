@@ -3,12 +3,11 @@ Main caveat is when a second syllable starts with a vowel and could take the pre
 In that case it does not work, and it is virtually impossible to do, without inferring meaning from the text first. 
 """
 
-from .mandarin_utils import (
+from source.mandarin_utils import (
     syllables_list,
     diacritics_to_base_letter,
     single_letter_consonant,
     vowel,
-    diacritics_to_decimals_full,
     diacritics_to_decimals_basic
 )
 
@@ -16,29 +15,15 @@ from .mandarin_utils import (
 class PinyinUtils:
     def __init__(self) -> None:
         pass
-
-    def tokenize_pinyin_text(self, text: str) -> list[str]:
-        """
-        Parses a text in pinyin and returns a list of its individual pinyin syllables
-
-        Keyword arguments:
-        text -- pinyin text
-        """
-        output = []
+    
+    def find_pinyin_syllable(self, text: str) -> list[str]:
+        output_syl = []
         eval_str = ""
-        text = self.clean_pinyin_text(text)
-        text += (
-            " " if text[-1] != " " else ""
-        )  # Needed to return end of string - bit hacky...
+
         for char in text.lower():
             eval_str += char
 
-            if eval_str[-1] == " ":
-                output.append(eval_str[:-1])
-                eval_str = ""
-                continue
-
-            if len(eval_str) > 3:
+            if len(eval_str) > 3: # Logic breaks with "yìshí"
                 temp_state = self.is_valid_pinyin_string(eval_str)
                 temp_string = self.remove_pinyin_diacritics(eval_str)
 
@@ -49,16 +34,41 @@ class PinyinUtils:
                 ):
                     if eval_str[-2] in single_letter_consonant:
                         if self.remove_pinyin_diacritics(eval_str)[-1] in vowel:
-                            output.append(eval_str[:-2])
+                            output_syl.append(eval_str[:-2])
                             eval_str = eval_str[-2:]
                         else:
-                            output.append(eval_str[:-1])
+                            output_syl.append(eval_str[:-1])
                             eval_str = eval_str[-1:]
                             continue
                     else:
-                        output.append(eval_str[:-1])
+                        output_syl.append(eval_str[:-1])
                         eval_str = eval_str[-1:]
                         continue
+        
+        output_syl.append(eval_str)
+        return output_syl
+
+    def tokenize_pinyin_text(self, text: str) -> list[str]:
+        """
+        Parses a text in pinyin and returns a list of its individual pinyin syllables
+
+        Keyword arguments:
+        text -- pinyin text
+        """
+
+        text = self.clean_pinyin_text(text)        
+        output = text.split(" ")
+        
+        output = map(self.find_pinyin_syllable, output)
+        output = [syllable for syllable_list in output for syllable in syllable_list]
+        
+        # Validate Output
+        invalid_syllables = ([i for i in output
+          if not self.is_valid_pinyin_string(self.remove_pinyin_diacritics(i)) ]
+          )
+
+        if any(invalid_syllables):
+            raise InvalidSyllablesError(f"Found unrecognized syllables {invalid_syllables}") 
 
         return output
 
@@ -120,3 +130,7 @@ class PinyinUtils:
             )
 
         return output
+    
+class InvalidSyllablesError(Exception):
+    pass
+print(PinyinUtils().tokenize_pinyin_text("yǒu dì lìyòng wǒ de shíj wān"))
