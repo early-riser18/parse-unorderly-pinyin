@@ -419,6 +419,7 @@ syllables_list = [
     "xun",
     "yun",
     "sho",
+    "r"
 ]
 
 diacritics_to_base_letter = {
