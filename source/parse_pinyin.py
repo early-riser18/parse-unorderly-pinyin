@@ -15,7 +15,7 @@ from source.mandarin_utils import (
 class PinyinUtils:
     def __init__(self) -> None:
         pass
-    
+     
     def find_pinyin_syllable(self, text: str) -> list[str]:
         output_syl = []
         eval_str = ""
@@ -23,7 +23,7 @@ class PinyinUtils:
         for char in text.lower():
             eval_str += char
 
-            if len(eval_str) > 3: # Logic breaks with "yìshí"
+            if len(eval_str) > 3: 
                 temp_state = self.is_valid_pinyin_string(eval_str)
                 temp_string = self.remove_pinyin_diacritics(eval_str)
 
@@ -133,4 +133,3 @@ class PinyinUtils:
     
 class InvalidSyllablesError(Exception):
     pass
-print(PinyinUtils().tokenize_pinyin_text("yǒu dì lìyòng wǒ de shíj wān"))
