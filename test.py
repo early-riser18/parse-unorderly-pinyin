@@ -6,7 +6,7 @@ class TestPinyinutils(unittest.TestCase):
     def test_find_pinyin_syllable(self):
         data = "dă yigè hāqian"
 
-        assert PinyinUtils().find_pinyin_syllable(data) == ['dă ', 'yi', 'gè ', 'hā', 'qian']
+        assert PinyinUtils().find_pinyin_syllable(data) == ['dă', 'yi', 'gè', 'hā', 'qian']
 
 print(PinyinUtils().find_pinyin_syllable("dă yigè hāqian"))
 
