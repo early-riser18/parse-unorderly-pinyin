@@ -9,3 +9,21 @@ In that case it does not work, and it is virtually impossible to do, without inf
 
 
 Credits to [ttempe](https://github.com/ttempe) for the decimal_pinyin to zhuyin converter.
+
+
+
+## New goal
+- Transform any text in pinyin, including punctuation, into its bopomofo equivalent. 
+#### Example 1:
+Input: yīnwéi dàizhe kǒuzhào yīzhí jiǎng huà ， hěn bù shūfú ，hěn mèn。
+Output: ㄧㄣ ㄨㄟˊ ㄉㄞˋ ㄓㄜ˙ ㄎㄡˇ ㄓㄠˋ ㄧ ㄓˊ ㄐㄧㄤˇ ㄏㄨㄚˋ，ㄏㄣˇ ㄅㄨˋ ㄕㄨ ㄈㄨˊ，ㄏㄣˇ ㄇㄣˋ。
+
+#### Example 2
+Input: Lingguo dàchīyìjīng!
+Output: ㄌㄧㄥˊ ㄍㄨㄛ˙ ㄉㄚˋ ㄔ ㄧˋ ㄐㄧㄥ!
+
+
+### TODOS
+- Achieve new goal
+- Set up input validation to ensure always valid output
+- Set up unit tests
