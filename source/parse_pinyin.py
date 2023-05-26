@@ -15,17 +15,18 @@ import re
 
 class PinyinDiacritic(str):
     def __new__(cls, value):
-        # try:
-        if not PinyinUtils().is_valid_pinyin_string(PinyinUtils().remove_pinyin_diacritics(value)):
-            raise InvalidSyllablesError(f'"{value}" is not recognized as a valid pinyin syllable')
-        return super().__new__(cls,value)
-    
-        
+        if not PinyinUtils().is_valid_pinyin_string(
+            PinyinUtils().remove_pinyin_diacritics(value)
+        ):
+            raise InvalidSyllablesError(
+                f'"{value}" is not recognized as a valid pinyin syllable'
+            )
+        return super().__new__(cls, value)
+
 
 class PinyinDecimal(str):
-    
-    def __init__(self) -> None:
-        super().__init__()
+    def __new__(cls, value):
+        pass
 
 
 class PinyinUtils:
@@ -53,10 +54,7 @@ class PinyinUtils:
                 temp_string = self.remove_pinyin_diacritics(eval_str)
 
                 # Check if this is a valid pinyin string
-                if (
-                    self.is_valid_pinyin_string(self.remove_pinyin_diacritics(eval_str))
-                    == False
-                ):
+                if not self.is_valid_pinyin_string(eval_str):
                     if eval_str[-2] in single_letter_consonant:
                         if self.remove_pinyin_diacritics(eval_str)[-1] in vowel:
                             output_syl.append(eval_str[:-2])
@@ -70,18 +68,18 @@ class PinyinUtils:
                         eval_str = eval_str[-1:]
                         continue
 
-        output_syl.append(eval_str)
+        output_syl.append(PinyinDiacritic(eval_str))
 
-        # Validate Output
-        invalid_syllables = [
-            i
-            for i in output_syl
-            if not self.is_valid_pinyin_string(self.remove_pinyin_diacritics(i))
-        ]
-        if any(invalid_syllables):
-            raise InvalidSyllablesError(
-                f"Found unrecognized syllables {invalid_syllables}"
-            )
+        # Validate Output - Outdated by casting to PinyinDiacritic type
+        # invalid_syllables = [
+        #     i
+        #     for i in output_syl
+        #     if not self.is_valid_pinyin_string(self.remove_pinyin_diacritics(i))
+        # ]
+        # if any(invalid_syllables):
+        #     raise InvalidSyllablesError(
+        #         f"Found unrecognized syllables {invalid_syllables}"
+        #     )
 
         return output_syl
 
@@ -111,11 +109,10 @@ class PinyinUtils:
         pinyin_str -- string to evaluate without accents or decimals
         """
 
-        return (pinyin_str
-                .replace(" ", "")
-                .lower() 
-                in syllables_list
-                )
+        return (
+            self.remove_pinyin_diacritics(pinyin_str).replace(" ", "").lower()
+            in syllables_list
+        )
 
     def clean_pinyin_text(self, text: str) -> str:
         """
@@ -128,7 +125,7 @@ class PinyinUtils:
         text = text.replace("?", " ")
         return text
 
-    def remove_pinyin_diacritics(self, pinyin_str: str) -> str:
+    def remove_pinyin_diacritics(self, pinyin_str: PinyinDiacritic) -> str:
         """
         Removes the diacritics (accents) from the provided pinyin string
 
@@ -136,7 +133,6 @@ class PinyinUtils:
         pinyin_str -- pinyin string with diacritics
         """
         output_str = ""
-
         for char in pinyin_str.lower():
             if char in diacritics_to_base_letter:
                 output_str += diacritics_to_base_letter[char]
@@ -166,7 +162,7 @@ class PinyinUtils:
         else:
             raise Exception("An error occurred while transforming to pinyin decimals")
 
-        return PinyinDecimal(output)
+        return output
 
     def keep_text_only(self, text: str) -> str:
         pattern = r"[a-zA-Z]+"
@@ -175,6 +171,7 @@ class PinyinUtils:
 
 class InvalidSyllablesError(Exception):
     pass
+
 
 """
 Types needed
