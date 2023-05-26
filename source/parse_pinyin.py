@@ -8,22 +8,44 @@ from source.mandarin_utils import (
     diacritics_to_base_letter,
     single_letter_consonant,
     vowel,
-    diacritics_to_decimals_basic
+    diacritics_to_decimals_basic,
 )
+import re
+
+
+class PinyinDiacritic(str):
+    def __new__(cls, value):
+        return super().__new__(cls)
+    
+        
+
+class PinyinDecimal(str):
+    
+    def __init__(self) -> None:
+        super().__init__()
 
 
 class PinyinUtils:
     def __init__(self) -> None:
         pass
-     
-    def find_pinyin_syllable(self, text: str) -> list[str]:
+
+    def pinyin_to_bopomofo(self, text: str) -> str:
+        """
+        Returns a text written in bopomofo, and equivalent to the text passed in pinyin
+        """
+        #
+
+    def find_pinyin_syllable(self, text: str) -> list[PinyinDiacritic]:
+        """
+        Takes a string written in pinyin and return it parsed per syllable
+        """
         output_syl = []
         eval_str = ""
 
         for char in text.lower():
             eval_str += char
 
-            if len(eval_str) > 3: 
+            if len(eval_str) > 3:
                 temp_state = self.is_valid_pinyin_string(eval_str)
                 temp_string = self.remove_pinyin_diacritics(eval_str)
 
@@ -44,11 +66,23 @@ class PinyinUtils:
                         output_syl.append(eval_str[:-1])
                         eval_str = eval_str[-1:]
                         continue
-        
+
         output_syl.append(eval_str)
+
+        # Validate Output
+        invalid_syllables = [
+            i
+            for i in output_syl
+            if not self.is_valid_pinyin_string(self.remove_pinyin_diacritics(i))
+        ]
+        if any(invalid_syllables):
+            raise InvalidSyllablesError(
+                f"Found unrecognized syllables {invalid_syllables}"
+            )
+
         return output_syl
 
-    def tokenize_pinyin_text(self, text: str) -> list[str]:
+    def tokenize_pinyin_text(self, text: str) -> list[PinyinDiacritic]:
         """
         Parses a text in pinyin and returns a list of its individual pinyin syllables
 
@@ -56,19 +90,13 @@ class PinyinUtils:
         text -- pinyin text
         """
 
-        text = self.clean_pinyin_text(text)        
+        # Clean text for parsing
+        text = self.clean_pinyin_text(text)
         output = text.split(" ")
-        
+
+        # Parse text
         output = map(self.find_pinyin_syllable, output)
         output = [syllable for syllable_list in output for syllable in syllable_list]
-        
-        # Validate Output
-        invalid_syllables = ([i for i in output
-          if not self.is_valid_pinyin_string(self.remove_pinyin_diacritics(i)) ]
-          )
-
-        if any(invalid_syllables):
-            raise InvalidSyllablesError(f"Found unrecognized syllables {invalid_syllables}") 
 
         return output
 
@@ -96,7 +124,7 @@ class PinyinUtils:
         text = text.replace("?", " ")
         return text
 
-    def remove_pinyin_diacritics(self, pinyin_str: str) -> str:
+    def remove_pinyin_diacritics(self, pinyin_str: PinyinDiacritic) -> str:
         """
         Removes the diacritics (accents) from the provided pinyin string
 
@@ -112,15 +140,18 @@ class PinyinUtils:
                 output_str += char
         return output_str
 
-    def pinyin_diacritics_to_decimals(self, syllable: str) -> str:
+    def pinyin_diacritics_to_decimals(self, syllable: PinyinDiacritic) -> PinyinDecimal:
         """
         It is assumed that there is only 1 accent per syllable.
 
         """
+        syllable = PinyinDiacritic(syllable)
         extracted_accent = []
-        extracted_accent = [char for char in syllable if char in diacritics_to_decimals_basic]
+        extracted_accent = [
+            char for char in syllable if char in diacritics_to_decimals_basic
+        ]
         syllable_no_diacritics = self.remove_pinyin_diacritics(syllable)
-        
+
         if len(extracted_accent) == 0:
             output = syllable_no_diacritics + "5"
 
@@ -128,8 +159,29 @@ class PinyinUtils:
             output = syllable_no_diacritics + str(
                 diacritics_to_decimals_basic[extracted_accent[0]][1]
             )
+        else:
+            raise Exception("An error occurred while transforming to pinyin decimals")
 
-        return output
-    
+        return PinyinDecimal(output)
+
+    def keep_text_only(self, text: str) -> str:
+        pattern = r"[a-zA-Z]+"
+        letters = re.findall(pattern, text)
+
+
 class InvalidSyllablesError(Exception):
     pass
+
+
+a= PinyinUtils().pinyin_diacritics_to_decimals(5)
+print(a)
+
+"""
+Types needed
+- PinyinDiacritic 
+- PinyinDecimal
+- str 
+
+Is validating by type casting necessarily the right way to ensure correct type of input?
+
+"""
