@@ -15,7 +15,10 @@ import re
 
 class PinyinDiacritic(str):
     def __new__(cls, value):
-        return super().__new__(cls)
+        # try:
+        if not PinyinUtils().is_valid_pinyin_string(PinyinUtils().remove_pinyin_diacritics(value)):
+            raise InvalidSyllablesError(f'"{value}" is not recognized as a valid pinyin syllable')
+        return super().__new__(cls,value)
     
         
 
@@ -108,10 +111,11 @@ class PinyinUtils:
         pinyin_str -- string to evaluate without accents or decimals
         """
 
-        allowed_syllables = syllables_list
-
-        pinyin_str = pinyin_str.replace(" ", "")
-        return pinyin_str.lower() in allowed_syllables
+        return (pinyin_str
+                .replace(" ", "")
+                .lower() 
+                in syllables_list
+                )
 
     def clean_pinyin_text(self, text: str) -> str:
         """
@@ -124,7 +128,7 @@ class PinyinUtils:
         text = text.replace("?", " ")
         return text
 
-    def remove_pinyin_diacritics(self, pinyin_str: PinyinDiacritic) -> str:
+    def remove_pinyin_diacritics(self, pinyin_str: str) -> str:
         """
         Removes the diacritics (accents) from the provided pinyin string
 
@@ -171,10 +175,6 @@ class PinyinUtils:
 
 class InvalidSyllablesError(Exception):
     pass
-
-
-a= PinyinUtils().pinyin_diacritics_to_decimals(5)
-print(a)
 
 """
 Types needed
